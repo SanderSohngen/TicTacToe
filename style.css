@@ -11,19 +11,19 @@ body {
 #header {
     display: flex;
     align-items: center;
-    justify-content: flex-start;
+    justify-content: space-between;
     height: 100px;
     background-color: #FFB600;
     padding: 10px;
     font-size: 30px;
 }
 
-#logo {
+.logo {
     width: 70px;
+    margin: 0 20px;
 }
 
 h1 {
-    margin: auto;
     color: #FF9100;
 }
 
@@ -38,7 +38,7 @@ h1 {
 }
 
 #message {
-    font-size: 40px;
+    font-size: 35px;
     color: #FF4800;
     margin: 10px;
 }
