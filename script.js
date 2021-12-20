@@ -10,29 +10,29 @@ const game = (() => {
 	const pizza = "img/pizza.svg";
 	const burger = "img/burger.svg";
 
-    const restart = document.querySelector("#restart");
-    restart.addEventListener("click", resetBoard);
+	const restart = document.querySelector("#restart");
+	restart.addEventListener("click", resetBoard);
 
 	function resetBoard() {
 		clearGameboard(gameboard);
-		clearSquares(squares);
 		resetMessage();
 		addListeners(squares);
 	}
 
 	function clearGameboard(gameboard) {
 		for (let i = 0; i < gameboard.length; i++) gameboard[i] = 0;
+		clearSquares(squares);
 	}
 
 	function clearSquares(squares) {
 		squares.forEach((square) => {
-			removeIMG(square);
+			removeImages(square);
 			square.classList.remove("taken-spot");
 			square.classList.add("free-spot");
 		});
 	}
 
-	function removeIMG(square) {
+	function removeImages(square) {
 		const img = square.childNodes[0];
 		if (img) square.removeChild(img);
 	}
@@ -61,28 +61,27 @@ const game = (() => {
 	}
 
 	function placePlay(id, playerTurn, gameboard) {
-		const idNumber = id[1];
+		const idNumber = id[1]; // because HTML id can't be number, they are formated as _number
 		gameboard[idNumber] = playerTurn;
 		const square = document.querySelector(`#${id}`);
 		adjustDivPlayed(square, playerTurn);
 	}
 
 	function adjustDivPlayed(square, playerTurn) {
-		adjustClasses(square);
+		toggleClasses(square);
 		square.removeEventListener("click", playRound);
-		const img = createIMG(playerTurn);
-		square.appendChild(img);
+		appendImageToSquare(square, playerTurn);
 	}
 
-	function adjustClasses(square) {
+	function toggleClasses(square) {
 		square.classList.add("taken-spot");
 		square.classList.remove("free-spot");
 	}
 
-	function createIMG(playerTurn) {
+	function appendImageToSquare(square, playerTurn) {
 		const img = document.createElement("img");
 		img.src = playerTurn === 1 ? pizza : burger;
-		return img;
+		square.appendChild(img);
 	}
 
 	function changeDisplayMessage(playerTurn) {
@@ -90,10 +89,10 @@ const game = (() => {
 	}
 
 	function checkIfGameEnded(gameboard, playerTurn) {
-		const winRow = checkRows(gameboard);
-		const winColumn = checkColumns(gameboard);
-		const winDiagonal = checkDiagonals(gameboard);
-		const aPlayerWon = winRow || winColumn || winDiagonal;
+		const aPlayerWon =
+			checkRows(gameboard) ||
+			checkColumns(gameboard) ||
+			checkDiagonals(gameboard);
 		const reachedDraw = checkDraw(gameboard);
 		const gameEnded = aPlayerWon || reachedDraw;
 		if (gameEnded) endGame(playerTurn, aPlayerWon);
