@@ -1,14 +1,17 @@
 const game = (() => {
 	const gameboard = [0, 0, 0, 0, 0, 0, 0, 0, 0];
 	const firstMessage = "Pizza Player turn";
-	const secondMessage = "Burguer Player turn";
+	const secondMessage = "Burger Player turn";
 	const firstWon = "Pizza Player won";
-	const secondWon = "Burguer Player won";
+	const secondWon = "Burger Player won";
 	const drawMessage = "It's a draw";
 	const message = document.querySelector("#message");
 	const squares = document.querySelectorAll(".square");
 	const pizza = "img/pizza.svg";
-	const burguer = "img/burger.svg";
+	const burger = "img/burger.svg";
+
+    const restart = document.querySelector("#restart");
+    restart.addEventListener("click", resetBoard);
 
 	function resetBoard() {
 		clearGameboard(gameboard);
@@ -49,7 +52,7 @@ const game = (() => {
 		const playerTurn = identifyTurn(gameboard);
 		placePlay(id, playerTurn, gameboard);
 		changeDisplayMessage(playerTurn);
-		if (gameEnded(gameboard)) endGame(playerTurn);
+		checkIfGameEnded(gameboard, playerTurn);
 	}
 
 	function identifyTurn(gameboard) {
@@ -78,8 +81,7 @@ const game = (() => {
 
 	function createIMG(playerTurn) {
 		const img = document.createElement("img");
-		img.src = playerTurn === 1 ? pizza : burguer;
-		img.style.height = "80px";
+		img.src = playerTurn === 1 ? pizza : burger;
 		return img;
 	}
 
@@ -87,16 +89,14 @@ const game = (() => {
 		message.textContent = playerTurn === 1 ? secondMessage : firstMessage;
 	}
 
-	function gameEnded(gameboard) {
-		const draw = checkDraws(gameboard);
+	function checkIfGameEnded(gameboard, playerTurn) {
 		const winRow = checkRows(gameboard);
 		const winColumn = checkColumns(gameboard);
 		const winDiagonal = checkDiagonals(gameboard);
-		return draw || winRow || winColumn || winDiagonal;
-	}
-
-	function checkDraws(gameboard) {
-		return gameboard.every((position) => position !== 0);
+		const aPlayerWon = winRow || winColumn || winDiagonal;
+		const reachedDraw = checkDraw(gameboard);
+		const gameEnded = aPlayerWon || reachedDraw;
+		if (gameEnded) endGame(playerTurn, aPlayerWon);
 	}
 
 	function checkRows(gameboard) {
@@ -129,9 +129,13 @@ const game = (() => {
 		return mainDiagonal || minorDiagonal;
 	}
 
-	function endGame(playerTurn) {
+	function checkDraw(gameboard) {
+		return gameboard.every((position) => position !== 0);
+	}
+
+	function endGame(playerTurn, aPlayerWon) {
 		removeAllListeners(squares);
-		displayWinnerMessage(playerTurn);
+		displayWinnerMessage(playerTurn, aPlayerWon);
 	}
 
 	function removeAllListeners(squares) {
@@ -140,12 +144,12 @@ const game = (() => {
 		});
 	}
 
-	function displayWinnerMessage(playerTurn) {
-		message.textContent = checkDraws(gameboard)
-			? drawMessage
-			: playerTurn === 1
-			? firstWon
-			: secondWon;
+	function displayWinnerMessage(playerTurn, aPlayerWon) {
+		message.textContent = aPlayerWon
+			? playerTurn === 1
+				? firstWon
+				: secondWon
+			: drawMessage;
 	}
 
 	return {
@@ -155,5 +159,4 @@ const game = (() => {
 
 game.resetBoard();
 
-const restart = document.querySelector("#restart");
-restart.addEventListener("click", game.resetBoard);
+//TODO create playerFactory

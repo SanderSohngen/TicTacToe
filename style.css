@@ -62,6 +62,11 @@ h1 {
     background-color: #FF7900;
 }
 
+.square img {
+    height: 80px;
+    width: 100%;
+}
+
 button {
     font-family: 'Pacifico', 'Montserrat', sans-serif;
     font-size: 20px;
@@ -73,7 +78,9 @@ button {
 }
 
 button:hover {
-    transform: scale(1.05);
+    background-color: #FF4800;
+    border: 8px solid #FFB600;
+    color: #FF9100;
 }
 
 
