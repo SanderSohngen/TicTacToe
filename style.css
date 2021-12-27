@@ -79,10 +79,13 @@ button {
 
 button:hover {
     background-color: #FF4800;
-    border: 8px solid #FFB600;
     color: #FF9100;
 }
 
+.selected {
+    background-color: #FF4800;
+    color: #FF9100;
+}
 
 #footer {
     margin-top: auto;
