@@ -1,107 +1,108 @@
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@500&family=Pacifico&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@500&family=Pacifico&display=swap");
 
 body {
-    display: flex;
-    flex-direction: column;
-    font-family: 'Pacifico', 'Montserrat', sans-serif;
-    margin: 0;
-    min-height: 100vh;
+	display: flex;
+	flex-direction: column;
+	font-family: "Pacifico", "Montserrat", sans-serif;
+	margin: 0;
+	min-height: 100vh;
 }
 
 #header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    height: 100px;
-    background-color: #FFB600;
-    padding: 10px;
-    font-size: 30px;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	height: 100px;
+	background-color: #ffb600;
+	padding: 10px;
+	font-size: 30px;
 }
 
 .logo {
-    width: 70px;
-    margin: 0 20px;
+	width: 70px;
+	margin: 0 20px;
 }
 
 h1 {
-    color: #FF9100;
+	color: #ff9100;
 }
 
 #content {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    flex-grow: 1;
-    background-color: #FF9100;
-    gap: 10px;
-    padding: 15px;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	flex-grow: 1;
+	background-color: #ff9100;
+	gap: 10px;
+	padding: 15px;
 }
 
 #message {
-    font-size: 35px;
-    color: #FF4800;
-    margin: 10px;
+	font-size: 35px;
+	color: #ff4800;
+	margin: 10px;
 }
 
 #game {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    grid-template-rows: repeat(3, 1fr);
-    flex-grow: 1;
-    border: 8px solid #FF4800;
-    border-radius: 5px;
-    min-width: 270px;
-    max-height: 270px;
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	grid-template-rows: repeat(3, 1fr);
+	flex-grow: 1;
+	border: 8px solid #ff4800;
+	border-radius: 5px;
+	min-width: 270px;
+	max-height: 270px;
 }
 
-.free-spot, .taken-spot {
-    border: 1px solid #FF4800;
+.free-spot,
+.taken-spot {
+	border: 1px solid #ff4800;
 }
 
 .free-spot:hover {
-    background-color: #FF7900;
+	background-color: #ff7900;
 }
 
 .square img {
-    height: 80px;
-    width: 100%;
+	height: 80px;
+	width: 100%;
 }
 
 button {
-    font-family: 'Pacifico', 'Montserrat', sans-serif;
-    font-size: 20px;
-    background-color: #FF9100;
-    border: 8px solid #FFB600;
-    border-radius: 8px;
-    color: #FF4800;
-    padding: 10px;
+	font-family: "Pacifico", "Montserrat", sans-serif;
+	font-size: 20px;
+	background-color: #ff9100;
+	border: 8px solid #ffb600;
+	border-radius: 8px;
+	color: #ff4800;
+	padding: 10px;
 }
 
 button:hover {
-    background-color: #FF4800;
-    color: #FF9100;
+	background-color: #ff4800;
+	color: #ff9100;
 }
 
 .selected {
-    background-color: #FF4800;
-    color: #FF9100;
+	background-color: #ff4800;
+	color: #ff9100;
 }
 
 #footer {
-    margin-top: auto;
-    text-align: center;
-    background-color: #FF4800;
-    color: #FFB600;
-    align-items: center;
-    font-family: 'Montserrat', sans-serif;
+	margin-top: auto;
+	text-align: center;
+	background-color: #ff4800;
+	color: #ffb600;
+	align-items: center;
+	font-family: "Montserrat", sans-serif;
 }
 
 #footer img {
-    height: 15px;
-    transition-timing-function: ease-in-out;
+	height: 15px;
+	transition-timing-function: ease-in-out;
 }
 
 #footer img:hover {
-    transform: rotate(1turn);
-    transition-duration: 0.5s;
+	transform: rotate(1turn);
+	transition-duration: 0.5s;
 }
