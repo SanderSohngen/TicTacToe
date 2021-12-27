@@ -158,4 +158,63 @@ const game = (() => {
 
 game.resetBoard();
 
-//TODO create playerFactory
+const playerFactory = (() => {
+	const Player = (icon, winMessage, turnMessage, marker) => {
+		const getIcon = () => icon;
+		const displayWinnerMessage = () => winMessage;
+		const displayTurnMessage = () => turnMessage;
+		const getMarker = () => marker;
+		return { getIcon, displayWinnerMessage, displayTurnMessage, getMarker};
+	};
+
+	const pizzaPlayer = () => {
+		const pizza = "img/pizza.svg";
+		const winMessage = "Pizza Player won";
+		const turnMessage = "Pizza Player turn";
+		const marker = 1;
+		const prototype = Player(pizza, winMessage, turnMessage, marker);
+		return prototype;
+	};
+
+	const burgerPlayer = () => {
+		const burger = "img/burger.svg";
+		const winMessage = "Burger Player won";
+		const turnMessage = "Burger Player turn";
+		const marker = -1;
+		const prototype = Player(burger, winMessage, turnMessage, marker);
+		return prototype;
+	};
+
+	const compBurguerPlayer = () => {
+		const prototype = burgerPlayer();
+		const playRound = (gameboard) => {
+			const openSlots = countOpenSlots(gameboard);
+			const slotPlayed = findSlotToPlay(gameboard, openSlots);
+			return slotPlayed;
+		};
+		function countOpenSlots(gameboard) {
+			const openSlots = 0;
+			for (let i = 0; i < gameboard.length; i++)
+				if (gameboard[i] === 0) openSlots++;
+			return openSlots;
+		}
+		function findSlotToPlay(gameboard, openSlots) {
+			const index = Math.floor(Math.random() * openSlots);
+			let openSlots = [];
+			for (let i = 0; i < gameboard.length; i++)
+				if(gameboard[i] === 0) openSlots.push(i);
+			return openSlots[index];
+		}
+		return Object.assign({}, prototype, {playRound});
+	};
+
+	createPizzaPlayer = () => pizzaPlayer;
+	createBurgerPlayer = () => burgerPlayer;
+	createBurgerCompPlayer = () => compBurguerPlayer;
+
+	return {
+		createPizzaPlayer,
+		createBurgerPlayer,
+		createBurgerCompPlayer,
+	}
+})();
