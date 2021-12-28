@@ -114,28 +114,22 @@ const playerFactory = (() => {
 			if (score !== 0) return score;
 			const movesLeft = !gameflow.getGameDrawed(gameboard);
 			if (!movesLeft) return 0;
-			if (isMax) {
-				let best = -1000;
-				for (let i = 0; i < gameboard.length; i++) {
-					if (gameboard[i] === 0) {
+			let best = isMax ? -1000 : 1000;
+			for (let i = 0; i < gameboard.length; i++) {
+				if (gameboard[i] === 0) {
+					let auxFunc;
+					if (isMax) {
 						gameboard[i] = -1;
-						best = Math.max(best, minimax(gameboard, depth + 1, false));
-						gameboard[i] = 0;
-					}
-				}
-				return best;
-			}
-			else {
-				let best = 1000;
-				for (let i = 0; i < gameboard.length; i++) {
-					if (gameboard[i] === 0) {
+						auxFunc = Math.max;
+					} else {
 						gameboard[i] = 1;
-						best = Math.min(best, minimax(gameboard, depth + 1, true));
-						gameboard[i] = 0;
+						auxFunc = Math.min;
 					}
+					best = auxFunc(best, minimax(gameboard, depth + 1, !isMax));
+					gameboard[i] = 0;
 				}
-				return best;
 			}
+			return best;
 		}
 
 		function evaluteScore(gameboard) {
