@@ -46,7 +46,7 @@ const gameflow = (() => {
 
 	function checkDraw(gameboard) {
 		return !checkIfAPlayerWon(gameboard) && gameboard.every((position) => position !== 0);
-	}
+	} // first condition avoids considering a last move win as a draw
 
 	return {
 		getGameEnded: checkIfGameEnded,
@@ -98,7 +98,7 @@ const playerFactory = (() => {
 			for (let i = 0; i < gameboard.length; i++) {
 				if (gameboard[i] === 0) {
 					gameboard[i] = -1;
-					let moveVal = minimax(gameboard, 0, false);
+					const moveVal = minimax(gameboard, 0, false);
 					gameboard[i] = 0;
 					if (moveVal > bestVal) {
 						bestSlot = i;
@@ -110,8 +110,8 @@ const playerFactory = (() => {
 		};
 
 		function minimax(gameboard, depth, isMax) {
-			let score = evaluteScore(gameboard);
-			if (score !== 0) return score;
+			const score = evaluteScore(gameboard);
+			if (score !== 0) return score - depth; // depth is being subtracted in order to win as fast as possible
 			const movesLeft = !gameflow.getGameDrawed(gameboard);
 			if (!movesLeft) return 0;
 			let best = isMax ? -1000 : 1000;
@@ -137,7 +137,7 @@ const playerFactory = (() => {
 			const drawed = gameflow.getGameDrawed(gameboard);
 			if (!gameEnded || drawed) return 0;
 			const score = gameboard.reduce((sum, current) => sum - 20*current, 10);
-			return score
+			return score // reduce will make score alternate between -10 and 10, because board is filled with -1, 0 and 1
 		}
 		return Object.assign({}, prototype, { playRound, isComputer });
 	};
