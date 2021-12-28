@@ -1,3 +1,60 @@
+const gameflow = (() => {
+	function checkIfGameEnded(gameboard) {
+		const aPlayerWon = checkIfAPlayerWon(gameboard);
+		const reachedDraw = checkDraw(gameboard);
+		const gameEnded = aPlayerWon || reachedDraw;
+		return gameEnded;
+	}
+
+	function checkIfAPlayerWon(gameboard) {
+		return (
+			checkRows(gameboard) ||
+			checkColumns(gameboard) ||
+			checkDiagonals(gameboard)
+		);
+	}
+
+	function checkRows(gameboard) {
+		for (i = 0; i < gameboard.length; i += 3) {
+			if (gameboard[i] === 0) continue;
+			const firstColumnPair = gameboard[i] === gameboard[i + 1];
+			const secondColumnPair = gameboard[i] === gameboard[i + 2];
+			if (firstColumnPair && secondColumnPair) return true;
+		}
+		return false;
+	}
+
+	function checkColumns(gameboard) {
+		for (i = 0; i < 3; i++) {
+			if (gameboard[i] === 0) continue;
+			const firstRowPair = gameboard[i] === gameboard[i + 3];
+			const secondRowPair = gameboard[i] === gameboard[i + 6];
+			if (firstRowPair && secondRowPair) return true;
+		}
+		return false;
+	}
+
+	function checkDiagonals(gameboard) {
+		const centerPiece = gameboard[4];
+		if (centerPiece === 0) return false;
+		const mainDiagonal =
+			centerPiece === gameboard[0] && centerPiece === gameboard[8];
+		const minorDiagonal =
+			centerPiece === gameboard[2] && centerPiece === gameboard[6];
+		return mainDiagonal || minorDiagonal;
+	}
+
+	function checkDraw(gameboard) {
+		return !checkIfAPlayerWon(gameboard) && gameboard.every((position) => position !== 0);
+	} // first condition avoids considering a last move win as a draw
+
+	return {
+		getGameEnded: checkIfGameEnded,
+		getPlayerWon: checkIfAPlayerWon,
+		getGameDrawed: checkDraw,
+	};
+})();
+
 const playerFactory = (() => {
 	const Player = (icon, winMessage, turnMessage, marker) => {
 		const getIcon = () => icon;
@@ -36,22 +93,51 @@ const playerFactory = (() => {
 		const prototype = burgerPlayer();
 		const isComputer = () => true;
 		const playRound = (gameboard) => {
-			const openSlotsCounter = countOpenSlots(gameboard);
-			const slotPlayed = findSlotToPlay(gameboard, openSlotsCounter);
-			return slotPlayed;
+			let bestVal = -1000;
+			let bestSlot;
+			for (let i = 0; i < gameboard.length; i++) {
+				if (gameboard[i] === 0) {
+					gameboard[i] = -1;
+					const moveVal = minimax(gameboard, 0, false);
+					gameboard[i] = 0;
+					if (moveVal > bestVal) {
+						bestSlot = i;
+						bestVal = moveVal;
+					}
+				}
+			}
+			return bestSlot;
 		};
-		function countOpenSlots(gameboard) {
-			let openSlotsCounter = 0;
-			for (let i = 0; i < gameboard.length; i++)
-				if (gameboard[i] === 0) openSlotsCounter++;
-			return openSlotsCounter;
+
+		function minimax(gameboard, depth, isMax) {
+			const score = evaluteScore(gameboard);
+			if (score !== 0) return score - depth; // depth is being subtracted in order to win as fast as possible
+			const movesLeft = !gameflow.getGameDrawed(gameboard);
+			if (!movesLeft) return 0;
+			let best = isMax ? -1000 : 1000;
+			for (let i = 0; i < gameboard.length; i++) {
+				if (gameboard[i] === 0) {
+					let auxFunc;
+					if (isMax) {
+						gameboard[i] = -1;
+						auxFunc = Math.max;
+					} else {
+						gameboard[i] = 1;
+						auxFunc = Math.min;
+					}
+					best = auxFunc(best, minimax(gameboard, depth + 1, !isMax));
+					gameboard[i] = 0;
+				}
+			}
+			return best;
 		}
-		function findSlotToPlay(gameboard, openSlotsCounter) {
-			const index = Math.floor(Math.random() * openSlotsCounter);
-			let openSlots = [];
-			for (let i = 0; i < gameboard.length; i++)
-				if (gameboard[i] === 0) openSlots.push(i);
-			return openSlots[index];
+
+		function evaluteScore(gameboard) {
+			const gameEnded = gameflow.getGameEnded(gameboard);
+			const drawed = gameflow.getGameDrawed(gameboard);
+			if (!gameEnded || drawed) return 0;
+			const score = gameboard.reduce((sum, current) => sum - 20*current, 10);
+			return score // reduce will make score alternate between -10 and 10, because board is filled with -1, 0 and 1
 		}
 		return Object.assign({}, prototype, { playRound, isComputer });
 	};
@@ -145,11 +231,11 @@ const game = (() => {
 	function playRound(event) {
 		const id = event.target.id;
 		const playerTurn = identifyTurn(gameboard);
-		console.table(playerTurn);
 		placePlay(id, playerTurn, gameboard);
 		changeDisplayMessage(playerTurn);
-		const gameEnded = checkIfGameEnded(gameboard, playerTurn);
-		if (!gameEnded && burgerPlayer.isComputer()) playComputerRound(gameboard);
+		const gameEnded = gameflow.getGameEnded(gameboard, playerTurn);
+		if (gameEnded) endGame(playerTurn, gameflow.getPlayerWon(gameboard));
+		else if (burgerPlayer.isComputer()) playComputerRound(gameboard);
 	}
 
 	function playComputerRound(gameboard) {
@@ -157,7 +243,8 @@ const game = (() => {
 		const playerTurn = burgerPlayer;
 		placePlay(id, playerTurn, gameboard);
 		changeDisplayMessage(playerTurn);
-		checkIfGameEnded(gameboard, playerTurn);
+		const gameEnded = gameflow.getGameEnded(gameboard, playerTurn);
+		if (gameEnded) endGame(playerTurn, gameflow.getPlayerWon(gameboard));
 	}
 
 	function identifyTurn(gameboard) {
@@ -191,51 +278,6 @@ const game = (() => {
 
 	function changeDisplayMessage(playerTurn) {
 		message.textContent = playerTurn.getTurnMessage();
-	}
-
-	function checkIfGameEnded(gameboard, playerTurn) {
-		const aPlayerWon =
-			checkRows(gameboard) ||
-			checkColumns(gameboard) ||
-			checkDiagonals(gameboard);
-		const reachedDraw = checkDraw(gameboard);
-		const gameEnded = aPlayerWon || reachedDraw;
-		if (gameEnded) endGame(playerTurn, aPlayerWon);
-		return gameEnded;
-	}
-
-	function checkRows(gameboard) {
-		for (i = 0; i < gameboard.length; i += 3) {
-			if (gameboard[i] === 0) continue;
-			const firstColumnPair = gameboard[i] === gameboard[i + 1];
-			const secondColumnPair = gameboard[i] === gameboard[i + 2];
-			if (firstColumnPair && secondColumnPair) return true;
-		}
-		return false;
-	}
-
-	function checkColumns(gameboard) {
-		for (i = 0; i < 3; i++) {
-			if (gameboard[i] === 0) continue;
-			const firstRowPair = gameboard[i] === gameboard[i + 3];
-			const secondRowPair = gameboard[i] === gameboard[i + 6];
-			if (firstRowPair && secondRowPair) return true;
-		}
-		return false;
-	}
-
-	function checkDiagonals(gameboard) {
-		const centerPiece = gameboard[4];
-		if (centerPiece === 0) return false;
-		const mainDiagonal =
-			centerPiece === gameboard[0] && centerPiece === gameboard[8];
-		const minorDiagonal =
-			centerPiece === gameboard[2] && centerPiece === gameboard[6];
-		return mainDiagonal || minorDiagonal;
-	}
-
-	function checkDraw(gameboard) {
-		return gameboard.every((position) => position !== 0);
 	}
 
 	function endGame(playerTurn, aPlayerWon) {
